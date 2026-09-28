@@ -5,7 +5,7 @@
   field) or clicking the HUD readout opens that vessel's VesselFinder details
   page, keyed by its MMSI, in a new tab. Vessels without a 9-digit MMSI show no
   link. The opener is a host-supplied service, as for fire-perimeter InciWeb
-  links, so embeddings without it keep the card unchanged.
+  links, so embeddings without it keep the card unchanged (Git-Scram, #807).
 
 - CCTV cameras whose bearing is a guess now say so. Packs mark bearings derived
   from a hash of the camera id as `headingConfidence: 'low'`, but nothing read the
