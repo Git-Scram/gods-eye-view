@@ -61,6 +61,8 @@ export function createVesselLayer({ source, services, options = {} } = {}) {
     buildVesselCard: parts.cards.buildVesselCard,
     buildSelectedVesselCard: parts.cards.buildSelectedVesselCard,
     cardScreenSeparated: parts.cards.cardScreenSeparated,
+    // Application shortcut action: open the selected vessel's listing.
+    openSelectedVesselListing: () => parts.cards.openSelectedVesselListing(),
   });
   Object.defineProperty(layer, 'testing', { value: parts.testing });
   return layer;

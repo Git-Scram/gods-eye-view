@@ -46,7 +46,7 @@ class Element {
   }
 }
 
-function shortcuts() {
+function shortcuts({ listingOpens = true, listingAction = true } = {}) {
   const documentRef = new Element();
   const searchInput = new Element();
   const calls = [];
@@ -63,6 +63,13 @@ function shortcuts() {
   const actions = Object.fromEntries(
     names.map((name) => [name, (...args) => calls.push([name, ...args])]),
   );
+  // The listing action reports whether it opened a page; default to "opened".
+  if (listingAction) {
+    actions.openSelectedVesselListing = () => {
+      calls.push(['openSelectedVesselListing']);
+      return listingOpens;
+    };
+  }
   const controller = bindApplicationShortcuts({
     documentRef,
     searchInput,
@@ -123,6 +130,50 @@ test('shortcut extraction does not change repeat or modifier policy', () => {
   const f = shortcuts();
   f.press('h', new Element(), { repeat: true, ctrlKey: true });
   assert.deepEqual(f.calls, [['toggleHud']]);
+});
+
+test('L routes to the vessel listing action, prevents default only when a page opened', () => {
+  const f = shortcuts();
+  let prevented = 0;
+  const preventDefault = () => {
+    prevented += 1;
+  };
+  f.press('l', new Element(), { preventDefault });
+  f.press('L', new Element(), { preventDefault });
+  assert.deepEqual(f.calls, [
+    ['openSelectedVesselListing'],
+    ['openSelectedVesselListing'],
+  ]);
+  assert.equal(prevented, 2);
+
+  const inert = shortcuts({ listingOpens: false });
+  inert.press('l', new Element(), { preventDefault });
+  assert.deepEqual(inert.calls, [['openSelectedVesselListing']]);
+  assert.equal(prevented, 2);
+});
+
+test('L is inert on key auto-repeat, with modifiers, and in form controls', () => {
+  const f = shortcuts();
+  f.press('l', new Element(), { repeat: true });
+  f.press('l', new Element(), { ctrlKey: true });
+  f.press('l', new Element(), { metaKey: true });
+  f.press('l', new Element(), { altKey: true });
+  for (const tag of ['INPUT', 'SELECT', 'TEXTAREA'])
+    f.press('l', new Element(tag));
+  f.press('l', f.searchInput);
+  assert.deepEqual(f.calls, []);
+});
+
+test('L is inert for hosts that supply no vessel listing action', () => {
+  const f = shortcuts({ listingAction: false });
+  let prevented = 0;
+  f.press('l', new Element(), {
+    preventDefault: () => {
+      prevented += 1;
+    },
+  });
+  assert.deepEqual(f.calls, []);
+  assert.equal(prevented, 0);
 });
 
 test('destroy synchronously removes shortcuts and a replacement binds once', () => {

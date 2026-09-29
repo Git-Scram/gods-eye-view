@@ -530,12 +530,18 @@ responses cannot refill a cleared or replacement trail. Heading and course,
 sea-surface placement, click ownership and card selection policy are unchanged.
 
 The selected-vessel card and the `hud-ais-vessel` readout carry a
-`↗ VESSELFINDER` line for any vessel with a 9-digit MMSI. Pressing `L` (plain
-key, outside text inputs and editable fields) or clicking the HUD readout opens
+`↗ VESSELFINDER` line for any vessel with a 9-digit MMSI. Pressing `L` or
+clicking the HUD readout opens
 `https://www.vesselfinder.com/vessels/details/<MMSI>` in a new tab with
-`noopener,noreferrer`. The opener is the application-supplied `openExternal`
-service in `src/app/layers/aisLiveVessels.js`, as for fire-perimeter InciWeb
-links; without it the line is omitted and the key is inert. Card clicks keep
+`noopener,noreferrer`. The `L` key is a global application shortcut owned by
+`bindApplicationShortcuts` (`src/ui/applicationShortcuts.js`), which routes it
+to the layer's `openSelectedVesselListing` action supplied by the shell; the
+vessel layer's own keydown listener stays selection-local (Escape). The
+shortcut is inert on key auto-repeat, with Ctrl/Alt/Meta, and in form
+controls, and prevents the keydown default only when a page opened. The opener
+is the application-supplied `openExternal` service in
+`src/app/layers/aisLiveVessels.js`, as for fire-perimeter InciWeb links;
+without it the line is omitted and the action returns false. Card clicks keep
 their existing select-and-refocus behavior and never open the page.
 
 ## Military-flight components and aircraft mechanics

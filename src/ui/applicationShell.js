@@ -491,6 +491,10 @@ export class StyleManager extends ShellFacade {
         setScopeMaskEnabled: services.setScopeMaskEnabled,
         isScopeMaskEnabled: services.isScopeMaskEnabled,
         setScopeMaskFeather: services.setScopeMaskFeather,
+        // Global `L` shortcut: the vessel layer owns the selection and the
+        // external opener; the shortcut binder only routes the key.
+        openSelectedVesselListing: () =>
+          aisLiveVesselsLayer?.openSelectedVesselListing?.() === true,
       },
       elements: {
         _locationSearch: this._locationSearch,

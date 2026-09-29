@@ -1134,22 +1134,13 @@ test('vessel interaction wire: Escape deselects the selected vessel', () => {
 const EVER_GIVEN_LISTING =
   'https://www.vesselfinder.com/vessels/details/353136000';
 
-test('vessel interaction wire: L opens the selected vessel on VesselFinder in a new tab', () => {
+test('openSelectedVesselListing action opens the selected vessel on VesselFinder in a new tab', () => {
   const harness = installWireHarness(undefined);
   try {
-    let prevented = 0;
-    harness.keyTarget.dispatch({
-      key: 'l',
-      target: { tagName: 'CANVAS' },
-      preventDefault: () => { prevented += 1; },
-    });
+    assert.equal(aisLiveVesselsLayer.openSelectedVesselListing(), true);
     assert.deepEqual(harness.opened, [
       { url: EVER_GIVEN_LISTING, target: '_blank', features: 'noopener,noreferrer' },
     ]);
-    assert.equal(prevented, 1);
-    // Upper-case (Shift or Caps Lock) reads the same.
-    harness.keyTarget.dispatch({ key: 'L', target: { tagName: 'BODY' } });
-    assert.equal(harness.opened.length, 2);
     // The selection is untouched.
     assert.equal(aisLiveVesselsLayer.getSelectedInfo()?.mmsi, harness.record.mmsi);
   } finally {
@@ -1157,21 +1148,34 @@ test('vessel interaction wire: L opens the selected vessel on VesselFinder in a 
   }
 });
 
-test('vessel interaction wire: L is ignored while typing, with modifiers, or without a selection', () => {
+test('openSelectedVesselListing action is inert without a selection or without an MMSI', () => {
   const harness = installWireHarness(undefined);
   try {
-    harness.keyTarget.dispatch({ key: 'l', target: { tagName: 'INPUT' } });
-    harness.keyTarget.dispatch({ key: 'l', target: { tagName: 'TEXTAREA' } });
-    harness.keyTarget.dispatch({ key: 'l', target: { isContentEditable: true } });
-    harness.keyTarget.dispatch({ key: 'l', ctrlKey: true, target: {} });
-    harness.keyTarget.dispatch({ key: 'l', metaKey: true, target: {} });
-    harness.keyTarget.dispatch({ key: 'l', altKey: true, target: {} });
-    assert.equal(harness.opened.length, 0);
-
     harness.keyTarget.dispatch({ key: 'Escape' });
     assert.equal(aisLiveVesselsLayer.getSelectedInfo(), null);
-    harness.keyTarget.dispatch({ key: 'l', target: {} });
+    assert.equal(aisLiveVesselsLayer.openSelectedVesselListing(), false);
     assert.equal(harness.opened.length, 0);
+  } finally {
+    harness.cleanup();
+  }
+  const unkeyed = installWireHarness(undefined, {
+    selectedRecord: makeRecord({ mmsi: '' }),
+  });
+  try {
+    assert.equal(aisLiveVesselsLayer.openSelectedVesselListing(), false);
+    assert.equal(unkeyed.opened.length, 0);
+  } finally {
+    unkeyed.cleanup();
+  }
+});
+
+test('vessel layer keydown stays selection-local: L is not handled by the layer', () => {
+  const harness = installWireHarness(undefined);
+  try {
+    harness.keyTarget.dispatch({ key: 'l', target: {} });
+    harness.keyTarget.dispatch({ key: 'L', target: {} });
+    assert.equal(harness.opened.length, 0);
+    assert.equal(aisLiveVesselsLayer.getSelectedInfo()?.mmsi, harness.record.mmsi);
   } finally {
     harness.cleanup();
   }

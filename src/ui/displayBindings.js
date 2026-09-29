@@ -89,6 +89,8 @@ export class DisplayBindings {
           this._syncShareState();
         },
         toggleCctv: () => this._toggleCctvEnabled(),
+        openSelectedVesselListing: () =>
+          this.services.openSelectedVesselListing?.() === true,
       },
     });
 

@@ -16,6 +16,8 @@ const STYLE_KEYS = Object.freeze({
  * @param {Document} options.documentRef Keyboard event target.
  * @param {HTMLElement} options.searchInput Additional editing target.
  * @param {object} options.actions Existing application operations.
+ *   `openSelectedVesselListing` is optional and returns true when it opened
+ *   a page, in which case the keydown's default is prevented.
  * @returns {{destroy: Function}} Synchronous, idempotent listener cleanup.
  */
 export function bindApplicationShortcuts({
@@ -38,6 +40,21 @@ export function bindApplicationShortcuts({
     if (key === 'f') actions.toggleLayers();
     if (key === 'd') actions.cycleDetection();
     if (key === 'c') actions.toggleCctv();
+    // L opens the selected vessel's public listing in a new tab. Unlike the
+    // toggles above it has a side effect outside the app, so an auto-repeated
+    // keydown (one held key) and modifier chords (Ctrl+L is the browser's
+    // address bar) stay inert. The action is optional for hosts without it.
+    if (
+      key === 'l' &&
+      !event.repeat &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      typeof actions.openSelectedVesselListing === 'function'
+    ) {
+      if (actions.openSelectedVesselListing() === true)
+        event.preventDefault?.();
+    }
   };
   documentRef.addEventListener('keydown', onKeyDown);
   return {

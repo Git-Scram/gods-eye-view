@@ -365,7 +365,11 @@ ids or reset persistence versions when adding a body. The WEATHER adapter is
 
 `gods-eye-view/ui/input` exports `bindApplicationShortcuts` and
 `createStyleParameters`. The shortcut binder owns one bubbling keydown listener
-and receives the document, editing target and explicit action callbacks.
+and receives the document, editing target and explicit action callbacks. New
+global action keys belong here, not in layer-local listeners; layers keep only
+selection-local semantics such as Escape. The optional
+`openSelectedVesselListing` action (the `L` key) returns whether it opened a
+page and is skipped on key auto-repeat and modifier chords.
 Parameter controls own only the supplied container's generated rows/listeners;
 uniform metadata and read/write/change operations come from the caller.
 Clearing permits reuse; destruction is final. Neither module imports the app,

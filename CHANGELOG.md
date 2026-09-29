@@ -1,9 +1,10 @@
 # Changelog
 
 - Open a selected vessel's public listing. The selected-vessel card and the AIS
-  HUD readout now carry a `↗ VESSELFINDER` line; pressing `L` (outside a text
-  field) or clicking the HUD readout opens that vessel's VesselFinder details
-  page, keyed by its MMSI, in a new tab. Vessels without a 9-digit MMSI show no
+  HUD readout now carry a `↗ VESSELFINDER` line; pressing `L` (a global
+  application shortcut, inert on auto-repeat, with modifiers, and in form
+  controls) or clicking the HUD readout opens that vessel's VesselFinder
+  details page, keyed by its MMSI, in a new tab. Vessels without a 9-digit MMSI show no
   link. The opener is a host-supplied service, as for fire-perimeter InciWeb
   links, so embeddings without it keep the card unchanged (Git-Scram, #807).
 
